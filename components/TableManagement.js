@@ -1,4 +1,4 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -16,26 +16,8 @@ const navItems = [
   { label: 'Settings', route: '/settings' },
 ];
 
-const stats = [
-  { label: 'Active Reservations', value: 27, change: '+4%', icon: 'restaurant' },
-  { label: 'Orders Today', value: 124, change: '+16%', icon: 'receipt' },
-  { label: 'Pending Feedback', value: 9, change: '-2%', icon: 'message' },
-  { label: 'Waitlist', value: 14, change: '+7%', icon: 'clock' },
-];
 
-const features = [
-  { title: 'Reservations', description: 'Manage table bookings and arrivals.', icon: 'calendar', route: '/reservations' },
-  { title: 'Orders', description: 'Track orders and kitchen progress.', icon: 'shopping-cart', route: '/orders' },
-  { title: 'Menu Management', description: 'Update dishes, prices and availability.', icon: 'menu', route: '/menumanagement' },
-  { title: 'Customer Feedback', description: 'Review feedback and ratings.', icon: 'thumbs-up', route: '/feedback' },
-  { title: 'Table Management', description: 'Optimize seating layout in real time.', icon: 'grid', route: '/tablemanagement' },
-  { title: 'Waitlist', description: 'Monitor waiting guests efficiently.', icon: 'list', route: '/waitlist' },
-  { title: 'Live Chat', description: 'Support chat with in-house staff.', icon: 'chatbubbles', route: '/livechat' },
-  { title: 'Analytics', description: 'Real-time performance reporting.', icon: 'bar-chart', route: '/analytics' },
-  { title: 'Settings', description: 'Configure your restaurant management system.', icon: 'cog', route: '/settings' },
-];
-
-export default function Dashboard() {
+export default function TableManagement() {
   const router = useRouter();
 
   const handleNavigation = (route) => {
@@ -58,9 +40,9 @@ export default function Dashboard() {
           {navItems.map(({ label, route }) => (
             <TouchableOpacity
               key={label}
-              style={[styles.navItem, route === '/dashboard' && styles.activeNavItem]}
+              style={[styles.navItem, route === '/tablemanagement' && styles.activeNavItem]}
               onPress={() => handleNavigation(route)}>
-              <Text style={[styles.navText, route === '/dashboard' && styles.activeNavText]}>{label}</Text>
+              <Text style={[styles.navText, route === '/tablemanagement' && styles.activeNavText]}>{label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -71,62 +53,8 @@ export default function Dashboard() {
       </View>
 
       <View style={styles.mainSection}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
-          <View style={styles.headerRow}>
-            <View>
-              <Text style={styles.mainTitle}>Customer Service Dashboard</Text>
-              <Text style={styles.mainSubtitle}>Track your restaurant operations at a glance.</Text>
-            </View>
-            <TouchableOpacity style={styles.headerBtn}>
-              <Text style={styles.headerBtnText}>New Reservations</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.statsRow}>
-            {stats.map(({ label, value, change, icon }) => (
-              <View key={label} style={styles.statCard}>
-                <View style={styles.statTop}>
-                  <MaterialIcons name={icon} size={24} color="#2d8cff" />
-                  <Text style={[styles.changeText, change.startsWith('+') ? styles.positive : styles.negative]}>{change}</Text>
-                </View>
-                <Text style={styles.statValue}>{value}</Text>
-                <Text style={styles.statLabel}>{label}</Text>
-              </View>
-            ))}
-          </View>
-
-          <Text style={styles.sectionTitle}>Quick Access Features</Text>
-          <View style={styles.grid}>
-            {features.map((feature) => (
-              <TouchableOpacity
-                key={feature.title}
-                style={styles.featureCard}
-                onPress={() => handleNavigation(feature.route)}>
-                <View style={styles.featureIcon}>
-                  <FontAwesome5 name={feature.icon} size={18} color="#ffffff" />
-                </View>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDesc}>{feature.description}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Text style={[styles.sectionTitle, { marginTop: 22 }]}>Recent Activity</Text>
-          <View style={styles.activityContainer}>
-            <View style={styles.activityItem}>
-              <Text style={styles.activityTime}>10:55 AM</Text>
-              <Text style={styles.activityText}>New reservation created for Table 12, 6 guests.</Text>
-            </View>
-            <View style={styles.activityItem}>
-              <Text style={styles.activityTime}>09:45 AM</Text>
-              <Text style={styles.activityText}>Order #880 ready for pickup.</Text>
-            </View>
-            <View style={styles.activityItem}>
-              <Text style={styles.activityTime}>08:15 AM</Text>
-              <Text style={styles.activityText}>Feedback submitted by customer Maria S.</Text>
-            </View>
-          </View>
-        </ScrollView>
+        <Text style={styles.mainTitle}>Table Management</Text>
+        <Text style={styles.mainSubtitle}>Monitor and organize restaurant table availability.</Text>
       </View>
     </View>
   );
@@ -187,6 +115,39 @@ const styles = StyleSheet.create({
   activeNavText: {
     color: '#2d8cff',
     fontWeight: 'bold',
+  },
+  listCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  reservationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  guestName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  reservationMeta: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  status: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#16a34a',
   },
   mainSection: {
     flex: 1,
@@ -361,3 +322,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
