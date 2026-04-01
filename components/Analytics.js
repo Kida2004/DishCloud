@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -53,8 +53,47 @@ export default function Analytics() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Analytics & Reports</Text>
-        <Text style={styles.mainSubtitle}>View performance metrics and business insights.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Analytics & Reports</Text>
+              <Text style={styles.mainSubtitle}>View performance metrics and business insights.</Text>
+            </View>
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <MaterialIcons name="bar-chart" size={24} color="#2d8cff" />
+              <Text style={styles.statValue}>$12.4K</Text>
+              <Text style={styles.statLabel}>Weekly Revenue</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialIcons name="trending-up" size={24} color="#10b981" />
+              <Text style={styles.statValue}>+23%</Text>
+              <Text style={styles.statLabel}>Growth vs Last Week</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialIcons name="people" size={24} color="#f59e0b" />
+              <Text style={styles.statValue}>450</Text>
+              <Text style={styles.statLabel}>New Customers</Text>
+            </View>
+          </View>
+
+          <Text style={styles.sectionTitle}>Top Selling Categories</Text>
+          <View style={styles.chipGroup}>
+            {['Asian', 'Italian', 'Western', 'Desserts'].map((category, idx) => <View key={idx} style={styles.chip}><Text style={styles.chipText}>{category}</Text></View>)}
+          </View>
+
+          <Text style={styles.sectionTitle}>Monthly Sales Trend</Text>
+          <View style={styles.chartPlaceholder}>
+            <Text style={styles.chartPlaceholderText}>[Line chart placeholder]</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>Order Rate</Text>
+          <View style={styles.chartPlaceholder}>
+            <Text style={styles.chartPlaceholderText}>[Area chart placeholder]</Text>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -155,84 +194,6 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     position: 'relative',
   },
-  mainContent: {
-    paddingBottom: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  mainTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  mainSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 6,
-  },
-  headerBtn: {
-    backgroundColor: '#2d8cff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  headerBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  statsRow: {
-    flexDirection: width > 800 ? 'row' : 'column',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    width: width > 800 ? '24%' : '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  statTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  statLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-  },
-  changeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  positive: {
-    color: '#16a34a',
-  },
-  negative: {
-    color: '#dc2626',
-  },
-  sectionTitle: {
-    marginTop: 20,
-    marginBottom: 12,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -319,6 +280,92 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     marginLeft: 8,
+    fontSize: 14,
+  },
+  mainContent: {
+    paddingBottom: 20,
+  },
+  headerRow: {
+    marginBottom: 20,
+  },
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  mainSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
+  },
+  statsRow: {
+    flexDirection: width > 800 ? 'row' : 'column',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 24,
+  },
+  statCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: width > 800 ? '30%' : '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginBottom: 8,
+  },
+  chipGroup: {
+    flexDirection: 'row',
+    gap: 10,
+    flexWrap: 'wrap',
+    marginBottom: 16,
+  },
+  chip: {
+    backgroundColor: '#eef2ff',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  chipText: {
+    fontSize: 12,
+    color: '#3b82f6',
+    fontWeight: '600',
+  },
+  chartPlaceholder: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 180,
+  },
+  chartPlaceholderText: {
+    color: '#9ca3af',
     fontSize: 14,
   },
 });

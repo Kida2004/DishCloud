@@ -1,6 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const navItems = [
   { label: 'Dashboard', route: '/dashboard' },
@@ -19,6 +20,21 @@ const navItems = [
 
 export default function Feedback() {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const reviews = [
+    {name: 'Emily Richardson', rating: 5, text: 'Amazing food and excellent service!', date: '2 hours ago'},
+    {name: 'David Martinez', rating: 4, text: 'Great atmosphere, could improve portion sizes', date: '5 hours ago'},
+    {name: 'Jessica Lee', rating: 5, text: 'Best restaurant in town, highly recommended!', date: '1 day ago'},
+    {name: 'Michael Chen', rating: 3, text: 'Food was okay, but service was slow', date: '2 days ago'},
+    {name: 'Sarah Johnson', rating: 5, text: 'Perfect dining experience, will come back!', date: '3 days ago'},
+    {name: 'Robert Wilson', rating: 4, text: 'Great food, nice ambiance', date: '1 week ago'}
+  ];
+
+  const filteredReviews = reviews.filter(review =>
+    review.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    review.text.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleNavigation = (route) => {
     if (route) {
@@ -53,8 +69,88 @@ export default function Feedback() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Feedback</Text>
-        <Text style={styles.mainSubtitle}>View and respond to customer reviews and comments.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Customer Feedback</Text>
+              <Text style={styles.mainSubtitle}>View and respond to customer reviews and comments.</Text>
+            </View>
+          </View>
+
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color="#9ca3af" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search reviews by customer name or content..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#9ca3af"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color="#9ca3af" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <MaterialIcons name="star" size={24} color="#fbbf24" />
+              <Text style={styles.statValue}>4.8</Text>
+              <Text style={styles.statLabel}>Avg Rating</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialIcons name="message" size={24} color="#2d8cff" />
+              <Text style={styles.statValue}>156</Text>
+              <Text style={styles.statLabel}>Total Reviews</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialIcons name="thumb-up" size={24} color="#10b981" />
+              <Text style={styles.statValue}>92%</Text>
+              <Text style={styles.statLabel}>Positive</Text>
+            </View>
+            <View style={styles.statCard}>
+              <MaterialIcons name="reply" size={24} color="#8b5cf6" />
+              <Text style={styles.statValue}>45</Text>
+              <Text style={styles.statLabel}>Responded</Text>
+            </View>
+          </View>
+
+          <View style={styles.filterRow}>
+            <TouchableOpacity style={[styles.filterTag, {backgroundColor: '#e5e9f0'}]}><Text style={{color: '#fff', fontWeight: '600'}}>⭐⭐⭐⭐⭐</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.filterTag}><Text style={styles.filterTagText}>⭐⭐⭐⭐</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.filterTag}><Text style={styles.filterTagText}>⭐⭐⭐</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.filterTag}><Text style={styles.filterTagText}>Recent</Text></TouchableOpacity>
+          </View>
+
+          <Text style={styles.sectionTitle}>
+            Recent Reviews {filteredReviews.length < reviews.length && `(${filteredReviews.length} of ${reviews.length})`}
+          </Text>
+          {filteredReviews.length > 0 ? (
+            filteredReviews.map((review, idx) => (
+              <View key={idx} style={styles.feedbackCard}>
+                <View style={styles.feedbackTop}>
+                  <View>
+                    <Text style={styles.reviewerName}>{review.name}</Text>
+                    <Text style={styles.reviewDate}>{review.date}</Text>
+                  </View>
+                  <Text style={styles.rating}>{'⭐'.repeat(review.rating)}</Text>
+                </View>
+                <Text style={styles.reviewText}>{review.text}</Text>
+                <View style={styles.feedbackActions}>
+                  <TouchableOpacity style={styles.replyBtn}><Text style={styles.replyBtnText}>Reply</Text></TouchableOpacity>
+                  <TouchableOpacity style={styles.archiveBtn}><Text style={styles.archiveBtnText}>Archive</Text></TouchableOpacity>
+                </View>
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <MaterialIcons name="search-off" size={48} color="#d1d5db" />
+              <Text style={styles.emptyStateTitle}>No reviews found</Text>
+              <Text style={styles.emptyStateText}>Try adjusting your search terms</Text>
+            </View>
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -174,63 +270,24 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: 6,
   },
-  headerBtn: {
-    backgroundColor: '#2d8cff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  headerBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  statsRow: {
-    flexDirection: width > 800 ? 'row' : 'column',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    width: width > 800 ? '24%' : '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  statTop: {
+  searchBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 24,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
   },
-  statValue: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  statLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-  },
-  changeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  positive: {
-    color: '#16a34a',
-  },
-  negative: {
-    color: '#dc2626',
-  },
-  sectionTitle: {
-    marginTop: 20,
-    marginBottom: 12,
-    fontSize: 20,
-    fontWeight: 'bold',
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
     color: '#1f2b3d',
   },
   grid: {
@@ -320,6 +377,134 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
     fontSize: 14,
+  },
+  mainContent: {
+    paddingBottom: 20,
+  },
+  headerRow: {
+    marginBottom: 20,
+  },
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  mainSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
+  },
+  statsRow: {
+    flexDirection: width > 800 ? 'row' : 'column',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 24,
+  },
+  statCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: width > 800 ? '24%' : '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+    flexWrap: 'wrap',
+  },
+  filterTag: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 6,
+  },
+  filterTagText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginBottom: 16,
+  },
+  feedbackCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  feedbackTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  reviewerName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  rating: {
+    fontSize: 16,
+  },
+  reviewText: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  feedbackActions: {
+    flexDirection: 'row',
+    gap: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    paddingTop: 12,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#6b7280',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'center',
   },
 });
 

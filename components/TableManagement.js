@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -53,8 +53,54 @@ export default function TableManagement() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Table Management</Text>
-        <Text style={styles.mainSubtitle}>Monitor and organize restaurant table availability.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Table Management</Text>
+              <Text style={styles.mainSubtitle}>Monitor and organize restaurant table availability.</Text>
+            </View>
+          </View>
+
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendBox, {backgroundColor: '#10b981'}]} />
+              <Text style={styles.legendText}>Available</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendBox, {backgroundColor: '#f59e0b'}]} />
+              <Text style={styles.legendText}>Occupied</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendBox, {backgroundColor: '#6b7280'}]} />
+              <Text style={styles.legendText}>Reserved</Text>
+            </View>
+          </View>
+
+          <Text style={styles.sectionTitle}>Restaurant Floor Plan</Text>
+          <View style={styles.floorPlan}>
+            {[{id: '1', status: 'Available', guests: 0}, {id: '2', status: 'Occupied', guests: 4}, {id: '3', status: 'Occupied', guests: 2}, {id: '4', status: 'Available', guests: 0}, {id: '5', status: 'Reserved', guests: 6}, {id: '6', status: 'Available', guests: 0}, {id: 'VIP', status: 'Occupied', guests: 8}, {id: '7', status: 'Available', guests: 0}].map((table) => {
+              const statusColor = table.status === 'Available' ? '#10b981' : table.status === 'Occupied' ? '#f59e0b' : '#6b7280';
+              return (
+                <TouchableOpacity key={table.id} style={[styles.tableIcon, {borderColor: statusColor}]}>
+                  <MaterialIcons name="table-restaurant" size={28} color={statusColor} />
+                  <Text style={styles.tableNumber}>{table.id}</Text>
+                  {table.guests > 0 && <Text style={styles.guestCount}>{table.guests}</Text>}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.sectionTitle, {marginTop: 24}]}>Table Details</Text>
+          {[{table: 'Table 1', status: 'Available', duration: '-'}, {table: 'Table 2', status: 'Occupied', duration: '45 min'}, {table: 'VIP Table', status: 'Occupied', duration: '30 min'}].map((detail, idx) => (
+            <View key={idx} style={styles.tableDetailCard}>
+              <View style={styles.tableDetailTop}>
+                <Text style={styles.tableDetailName}>{detail.table}</Text>
+                <Text style={[styles.tableDetailStatus, {color: detail.status === 'Available' ? '#10b981' : '#f59e0b'}]}>● {detail.status}</Text>
+              </View>
+              <Text style={styles.tableDetailDuration}>Duration: {detail.duration}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
@@ -155,84 +201,6 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     position: 'relative',
   },
-  mainContent: {
-    paddingBottom: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  mainTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  mainSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 6,
-  },
-  headerBtn: {
-    backgroundColor: '#2d8cff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  headerBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  statsRow: {
-    flexDirection: width > 800 ? 'row' : 'column',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    width: width > 800 ? '24%' : '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  statTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  statLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-  },
-  changeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  positive: {
-    color: '#16a34a',
-  },
-  negative: {
-    color: '#dc2626',
-  },
-  sectionTitle: {
-    marginTop: 20,
-    marginBottom: 12,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -320,6 +288,121 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
     fontSize: 14,
+  },
+  mainContent: {
+    paddingBottom: 20,
+  },
+  headerRow: {
+    marginBottom: 20,
+  },
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  mainSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    gap: 24,
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
+  },
+  legendText: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '500',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginBottom: 16,
+  },
+  floorPlan: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    gap: 16,
+    marginBottom: 24,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  tableIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f9fafb',
+  },
+  tableNumber: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginTop: 4,
+  },
+  guestCount: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: '#f59e0b',
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    marginTop: 2,
+  },
+  tableDetailCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  tableDetailTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  tableDetailName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  tableDetailStatus: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  tableDetailDuration: {
+    fontSize: 12,
+    color: '#6b7280',
   },
 });
 

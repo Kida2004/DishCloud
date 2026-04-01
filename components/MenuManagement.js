@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -53,8 +53,68 @@ export default function MenuManagement() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Menu Management</Text>
-        <Text style={styles.mainSubtitle}>Update menu items, pricing, and availability.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Menu Management</Text>
+              <Text style={styles.mainSubtitle}>Update menu items, pricing, and availability.</Text>
+            </View>
+            <TouchableOpacity style={styles.addBtn}>
+              <MaterialIcons name="add" size={20} color="#fff" />
+              <Text style={styles.addBtnText}>Add Item</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.categoryScroll}>
+            <TouchableOpacity style={[styles.categoryTag, { borderBottomWidth: 3, borderBottomColor: '#2d8cff' }]}>
+              <Text style={styles.categoryTagActive}>All Items</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.categoryTag}>
+              <Text style={styles.categoryTagText}>Appetizers</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.categoryTag}>
+              <Text style={styles.categoryTagText}>Main Courses</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.categoryTag}>
+              <Text style={styles.categoryTagText}>Desserts</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.categoryTag}>
+              <Text style={styles.categoryTagText}>Beverages</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.menuItemsGrid}>
+            {[{name: 'Grilled Salmon', price: '$24.99', category: 'Main', status: 'Available'}, {name: 'Caesar Salad', price: '$12.50', category: 'Appetizer', status: 'Available'}, {name: 'Chocolate Cake', price: '$8.99', category: 'Dessert', status: 'Unavailable'}, {name: 'Espresso', price: '$4.50', category: 'Beverage', status: 'Available'}].map((item, idx) => (
+              <View key={idx} style={styles.menuItem}>
+                <View style={styles.itemHeader}>
+                  <View>
+                    <Text style={styles.itemName}>{item.name}</Text>
+                    <Text style={styles.itemCategory}>{item.category}</Text>
+                  </View>
+                  <View style={styles.statusContainer}>
+                    <Text style={[styles.itemStatus, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
+                      ●
+                    </Text>
+                    <Text style={[styles.statusText, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
+                      {item.status}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.itemFooter}>
+                  <Text style={styles.itemPrice}>{item.price}</Text>
+                  <View style={styles.itemActions}>
+                    <TouchableOpacity style={styles.iconBtn}>
+                      <MaterialIcons name="edit" size={16} color="#2d8cff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconBtn}>
+                      <MaterialIcons name="delete" size={16} color="#ef4444" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -154,25 +214,6 @@ const styles = StyleSheet.create({
     padding: 20,
     minHeight: '100%',
     position: 'relative',
-  },
-  mainContent: {
-    paddingBottom: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  mainTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  mainSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 6,
   },
   headerBtn: {
     backgroundColor: '#2d8cff',
@@ -320,6 +361,128 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
     fontSize: 14,
+  },
+  mainContent: {
+    paddingBottom: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  mainSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
+  },
+  addBtn: {
+    backgroundColor: '#2d8cff',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  addBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  categoryScroll: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+    paddingBottom: 12,
+  },
+  categoryTag: {
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  categoryTagText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  categoryTagActive: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2d8cff',
+  },
+  menuItemsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  menuItem: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: width > 900 ? '48%' : '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  itemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  itemName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  itemCategory: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  itemStatus: {
+    fontSize: 20,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  itemFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  itemPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2d8cff',
+  },
+  itemActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconBtn: {
+    backgroundColor: '#f3f4f6',
+    padding: 8,
+    borderRadius: 6,
   },
 });
 

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -53,8 +53,81 @@ export default function Settings() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Settings</Text>
-        <Text style={styles.mainSubtitle}>Configure your restaurant management system.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Settings</Text>
+              <Text style={styles.mainSubtitle}>Configure your restaurant management system.</Text>
+            </View>
+          </View>
+
+          <Text style={styles.sectionTitle}>General</Text>
+          {[
+            { label: 'Restaurant Name', value: 'Terraza Noble CMS', icon: 'restaurant' },
+            { label: 'Location', value: '123 Main St, City', icon: 'location-sharp' },
+            { label: 'Email', value: 'contact@terraza-noble.com', icon: 'email' },
+            { label: 'Phone', value: '+1 (555) 987-6543', icon: 'phone' },
+            { label: 'Website', value: 'www.terraza-noble.com', icon: 'public' },
+            { label: 'Business Hours', value: 'Mon-Sun 10:00 AM - 11:00 PM', icon: 'access-time' },
+          ].map((item, idx) => (
+            <View key={idx} style={styles.settingCard}>
+              <MaterialIcons name={item.icon} size={20} color="#2d8cff" />
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>{item.label}</Text>
+                <Text style={styles.settingDesc}>{item.value}</Text>
+              </View>
+              <TouchableOpacity style={styles.settingAction}><Text style={styles.settingActionText}>Edit</Text></TouchableOpacity>
+            </View>
+          ))}
+
+          <Text style={styles.sectionTitle}>More Configurations</Text>
+          {[
+            { label: 'SMS Notifications', status: true },
+            { label: 'Table Auto-Expiry (mins)', status: '30' },
+            { label: 'Reservation Reminder', status: '15 mins before' },
+            { label: 'Daily Backup', status: true },
+          ].map((item, idx) => (
+            <View key={idx} style={styles.settingCard}>
+              <MaterialIcons name="tune" size={20} color="#2d8cff" />
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>{item.label}</Text>
+                <Text style={styles.settingDesc}>{item.status.toString()}</Text>
+              </View>
+              <TouchableOpacity style={[styles.settingAction, item.status === true || item.status === '30' || item.status === '15 mins before' ? styles.actionActive : styles.actionInactive]}>
+                <Text style={styles.settingActionText}>{item.status === true ? 'On' : item.status === false ? 'Off' : 'Edit'}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <Text style={styles.sectionTitle}>Features</Text>
+          {[
+            { label: 'Online Ordering', status: true },
+            { label: 'Push Notifications', status: false },
+            { label: 'Auto Confirm', status: true },
+          ].map((item, idx) => (
+            <View key={idx} style={styles.settingCard}>
+              <MaterialIcons name="settings" size={20} color="#2d8cff" />
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>{item.label}</Text>
+                <Text style={styles.settingDesc}>{item.status ? 'Enabled' : 'Disabled'}</Text>
+              </View>
+              <TouchableOpacity style={[styles.settingAction, item.status ? styles.actionActive : styles.actionInactive]}>
+                <Text style={styles.settingActionText}>{item.status ? 'On' : 'Off'}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <Text style={styles.sectionTitle}>Security</Text>
+          <View style={styles.settingCard}>
+            <MaterialIcons name="lock" size={20} color="#2d8cff" />
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Change Password</Text>
+              <Text style={styles.settingDesc}>Update your account password</Text>
+            </View>
+            <TouchableOpacity style={styles.settingAction}><Text style={styles.settingActionText}>Change</Text></TouchableOpacity>
+          </View>
+
+        </ScrollView>
       </View>
     </View>
   );
@@ -155,84 +228,6 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     position: 'relative',
   },
-  mainContent: {
-    paddingBottom: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  mainTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  mainSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 6,
-  },
-  headerBtn: {
-    backgroundColor: '#2d8cff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  headerBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  statsRow: {
-    flexDirection: width > 800 ? 'row' : 'column',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    width: width > 800 ? '24%' : '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  statTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
-  statLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-  },
-  changeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  positive: {
-    color: '#16a34a',
-  },
-  negative: {
-    color: '#dc2626',
-  },
-  sectionTitle: {
-    marginTop: 20,
-    marginBottom: 12,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2b3d',
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -320,5 +315,72 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
     fontSize: 14,
+  },
+  mainContent: {
+    paddingBottom: 20,
+  },
+  headerRow: {
+    marginBottom: 20,
+  },
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  mainSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginBottom: 12,
+    marginTop: 12,
+  },
+  settingCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  settingInfo: {
+    flex: 1,
+  },
+  settingLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2b3d',
+  },
+  settingDesc: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  settingAction: {
+    backgroundColor: '#e8f1ff',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  settingActionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2d8cff',
+  },
+  actionActive: {
+    backgroundColor: '#10b981',
+  },
+  actionInactive: {
+    backgroundColor: '#f3f4f6',
   },
 });

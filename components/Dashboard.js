@@ -1,5 +1,6 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const navItems = [
@@ -37,6 +38,7 @@ const features = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const [activityView, setActivityView] = useState('weekly');
 
   const handleNavigation = (route) => {
     if (route) {
@@ -47,6 +49,98 @@ export default function Dashboard() {
   const handleLogout = () => {
     Alert.alert('Logged out', 'You have been logged out.');
     router.replace('/');
+  };
+
+  // Activity data for different views
+  const activityData = {
+    weekly: [45, 52, 48, 65, 72, 58, 64],
+    monthly: [180, 220, 190, 250, 280, 240, 260, 275, 290, 310, 320, 280],
+    yearly: [2400, 2210, 2290, 2000, 2181, 2500, 2100],
+  };
+
+  // Order rate line chart data (months)
+  const orderRateData = [35, 42, 38, 55, 48, 65, 52, 68, 58, 72, 80, 75];
+
+  const SimpleLineChart = ({ data, labels }) => {
+    const maxValue = Math.max(...data);
+    const chartHeight = 160;
+    const chartWidth = width - 80;
+    const interval = 4;
+    const chartBlocks = 5;
+
+    const lineLabels = labels || data.map((_, idx) => `W${idx + 1}`);
+
+    return (
+      <View style={styles.chartContainer}>
+        <View style={styles.lineChartWrapper}>
+          <View style={styles.yAxis}>
+            {Array.from({ length: chartBlocks + 1 }).map((_, idx) => {
+              const value = Math.round(maxValue - (maxValue / chartBlocks) * idx);
+              return (
+                <View key={idx} style={styles.yAxisRow}>
+                  <Text style={styles.yAxisLabel}>{value}</Text>
+                  <View style={styles.gridLine} />
+                </View>
+              );
+            })}
+          </View>
+          <View style={styles.chartPlot}>
+            {data.map((value, idx) => {
+              const height = (value / maxValue) * chartHeight;
+              return (
+                <View key={idx} style={[styles.plotPointContainer]}> 
+                  <View style={[styles.bar, { height, backgroundColor: '#2d8cff' }]} />
+                  <View style={[styles.dot, { bottom: height - 4 }]} />
+                  <Text style={[styles.dataPointLabel, { bottom: height + 10 }]}>{value}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+        <View style={styles.xAxis}>
+          {lineLabels.map((label, idx) => (
+            <Text key={idx} style={styles.xAxisLabel}>{label}</Text>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const SimpleBarChart = ({ data, view }) => {
+    const maxValue = Math.max(...data);
+    const chartHeight = 140;
+    const chartWidth = width - 80;
+    const labels = {
+      weekly: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      monthly: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      yearly: ['Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6', 'Y7'],
+    };
+
+    const labelSet = labels[view] || data.map((_, idx) => `P${idx + 1}`);
+
+    return (
+      <View style={styles.chartContainer}>
+        <View style={styles.gridBackground}>
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <View key={idx} style={styles.gridRow} />
+          ))}
+        </View>
+        <View style={styles.barsContainer}>
+          {data.map((value, idx) => {
+            const height = (value / maxValue) * chartHeight;
+            return (
+              <View key={idx} style={styles.barColumn}> 
+                <View style={styles.barWrapper}>
+                  <View style={[styles.bar, { height, backgroundColor: '#10b981' }]} />
+                  <Text style={[styles.dataPointLabel, { color: '#1f2b3d', fontWeight: 'bold' }]}>{value}</Text>
+                </View>
+                <Text style={styles.barLabel}>{labelSet[idx]}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -95,20 +189,57 @@ export default function Dashboard() {
             ))}
           </View>
 
-          <Text style={styles.sectionTitle}>Quick Access Features</Text>
-          <View style={styles.grid}>
-            {features.map((feature) => (
-              <TouchableOpacity
-                key={feature.title}
-                style={styles.featureCard}
-                onPress={() => handleNavigation(feature.route)}>
-                <View style={styles.featureIcon}>
-                  <FontAwesome5 name={feature.icon} size={18} color="#ffffff" />
-                </View>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDesc}>{feature.description}</Text>
-              </TouchableOpacity>
-            ))}
+          <Text style={styles.sectionTitle}>Business Status</Text>
+          
+          {/* Total Sales and Expense Cards */}
+          <View style={styles.cardsRow}>
+            <View style={styles.infoCard}>
+              <View style={styles.cardTop}>
+                <Text style={styles.cardLabel}>Total Sales</Text>
+                <Text style={[styles.cardChange, styles.positive]}>↑ 34.7%</Text>
+              </View>
+              <Text style={styles.cardValue}>$1200.00</Text>
+              <Text style={styles.cardSubtext}>1200 Items</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <View style={styles.cardTop}>
+                <Text style={styles.cardLabel}>Total Expense</Text>
+                <Text style={[styles.cardChange, styles.negative]}>↓ 34.7%</Text>
+              </View>
+              <Text style={styles.cardValue}>$950.00</Text>
+              <Text style={styles.cardSubtext}>1500 Items</Text>
+            </View>
+          </View>
+
+          {/* Order Rate Chart */}
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Order Rate</Text>
+            <SimpleLineChart data={orderRateData} labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']} />
+          </View>
+
+          {/* Activity Chart */}
+          <View style={styles.chartCard}>
+            <View style={styles.chartHeader}>
+              <Text style={styles.chartTitle}>Activity</Text>
+              <View style={styles.viewToggle}>
+                <TouchableOpacity 
+                  style={[styles.toggleBtn, activityView === 'weekly' && styles.toggleBtnActive]}
+                  onPress={() => setActivityView('weekly')}>
+                  <Text style={[styles.toggleText, activityView === 'weekly' && styles.toggleTextActive]}>Weekly</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.toggleBtn, activityView === 'monthly' && styles.toggleBtnActive]}
+                  onPress={() => setActivityView('monthly')}>
+                  <Text style={[styles.toggleText, activityView === 'monthly' && styles.toggleTextActive]}>Monthly</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.toggleBtn, activityView === 'yearly' && styles.toggleBtnActive]}
+                  onPress={() => setActivityView('yearly')}>
+                  <Text style={[styles.toggleText, activityView === 'yearly' && styles.toggleTextActive]}>Yearly</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <SimpleBarChart data={activityData[activityView]} view={activityView} />
           </View>
 
           <Text style={[styles.sectionTitle, { marginTop: 22 }]}>Recent Activity</Text>
@@ -298,6 +429,212 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+  },
+  cardsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 16,
+    flexWrap: 'wrap',
+  },
+  infoCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    flex: 1,
+    minWidth: 160,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardLabel: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  cardChange: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  cardValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginBottom: 4,
+  },
+  cardSubtext: {
+    fontSize: 12,
+    color: '#9ca3af',
+  },
+  chartCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  viewToggle: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  toggleBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  toggleBtnActive: {
+    backgroundColor: '#dcf472',
+    borderColor: '#dcf472',
+  },
+  toggleText: {
+    fontSize: 12,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  toggleTextActive: {
+    color: '#1f2b3d',
+  },
+  chartContainer: {
+    marginTop: 16,
+  },
+  lineChartWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 200,
+    marginBottom: 16,
+  },
+  yAxis: {
+    width: 35,
+    justifyContent: 'space-between',
+    height: 150,
+    paddingRight: 8,
+    alignItems: 'flex-end',
+  },
+  yAxisLabel: {
+    fontSize: 11,
+    color: '#9ca3af',
+  },
+  chartPlot: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    paddingHorizontal: 4,
+    height: 150,
+    borderBottomWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  barContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  xAxis: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginLeft: 35,
+    paddingHorizontal: 4,
+    paddingTop: 8,
+  },
+  xAxisLabel: {
+    fontSize: 11,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  yAxisRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  plotPointContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  gridLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginLeft: 6,
+  },
+  dot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#2d8cff',
+  },
+  dataPointLabel: {
+    fontSize: 10,
+    color: '#2d8cff',
+    position: 'absolute',
+    top: -20,
+    textAlign: 'center',
+  },
+  gridBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 30,
+    justifyContent: 'space-between',
+  },
+  gridRow: {
+    height: 1,
+    backgroundColor: '#e5e7eb',
+  },
+  barsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 150,
+    paddingHorizontal: 4,
+  },
+  barColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  barWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+  },
+  bar: {
+    width: 20,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  barLabel: {
+    fontSize: 10,
+    color: '#6b7280',
+    marginTop: 4,
+    textAlign: 'center',
   },
   featureTitle: {
     fontSize: 16,

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -53,8 +53,48 @@ export default function CustomerProfiles() {
       </View>
 
       <View style={styles.mainSection}>
-        <Text style={styles.mainTitle}>Customer Profiles</Text>
-        <Text style={styles.mainSubtitle}>Access customer information and dining history.</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.mainContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.mainTitle}>Customer Profiles</Text>
+              <Text style={styles.mainSubtitle}>Access customer information and dining history.</Text>
+            </View>
+          </View>
+
+          <View style={styles.searchBar}>
+            <MaterialIcons name="search" size={20} color="#6b7280" />
+            <Text style={styles.searchPlaceholder}>Search customers...</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>Top Customers</Text>
+          {[{name: 'John Anderson', visits: 18, lastVisit: '2 days ago', spent: '$1,240', status: 'VIP'}, {name: 'Emma Wilson', visits: 14, lastVisit: '1 week ago', spent: '$980', status: 'Regular'}, {name: 'David Martinez', visits: 12, lastVisit: '3 days ago', spent: '$850', status: 'Regular'}, {name: 'Sarah Thompson', visits: 16, lastVisit: 'Today', spent: '$1,100', status: 'VIP'}].map((customer, idx) => (
+            <View key={idx} style={styles.customerCard}>
+              <View style={styles.customerHeader}>
+                <View style={styles.customerAvatar}>
+                  <Text style={styles.avatarText}>{customer.name.charAt(0)}</Text>
+                </View>
+                <View style={styles.customerInfo}>
+                  <Text style={styles.customerName}>{customer.name}</Text>
+                  <Text style={styles.customerEmail}>Last visit: {customer.lastVisit}</Text>
+                </View>
+                <View style={[styles.statusBadge, {backgroundColor: customer.status === 'VIP' ? '#f59e0b' : '#e5e7eb'}]}>
+                  <Text style={[styles.statusText, {color: customer.status === 'VIP' ? '#fff' : '#6b7280'}]}>{customer.status}</Text>
+                </View>
+              </View>
+              <View style={styles.customerStats}>
+                <View style={styles.stat}>
+                  <Text style={styles.statLabel}>Visits</Text>
+                  <Text style={styles.statValue}>{customer.visits}</Text>
+                </View>
+                <View style={styles.stat}>
+                  <Text style={styles.statLabel}>Total Spent</Text>
+                  <Text style={styles.statValue}>{customer.spent}</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.viewBtn}><Text style={styles.viewBtnText}>View Profile</Text></TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
@@ -320,5 +360,109 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
     fontSize: 14,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 24,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  searchPlaceholder: {
+    fontSize: 14,
+    color: '#9ca3af',
+  },
+  customerCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  customerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  customerAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#2d8cff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  customerInfo: {
+    flex: 1,
+  },
+  customerName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+  },
+  customerEmail: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  customerStats: {
+    flexDirection: 'row',
+    gap: 24,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#e5e7eb',
+    marginBottom: 12,
+  },
+  stat: {
+    alignItems: 'center',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: '#6b7280',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2b3d',
+    marginTop: 2,
+  },
+  viewBtn: {
+    backgroundColor: '#e8f1ff',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  viewBtnText: {
+    color: '#2d8cff',
+    fontWeight: '600',
+    fontSize: 13,
   },
 });
