@@ -16,6 +16,99 @@ const navItems = [
   { label: 'Settings', route: '/settings' },
 ];
 
+const monthlySalesData = [
+  { label: 'Jan', value: 8200 },
+  { label: 'Feb', value: 9100 },
+  { label: 'Mar', value: 8700 },
+  { label: 'Apr', value: 9800 },
+  { label: 'May', value: 10400 },
+  { label: 'Jun', value: 11200 },
+];
+
+const orderRateData = [
+  { label: 'Mon', value: 42 },
+  { label: 'Tue', value: 48 },
+  { label: 'Wed', value: 45 },
+  { label: 'Thu', value: 57 },
+  { label: 'Fri', value: 63 },
+  { label: 'Sat', value: 71 },
+  { label: 'Sun', value: 66 },
+];
+
+function CircularChartCard({ data, color, valuePrefix = '', valueSuffix = '', centerLabel, totalLabel }) {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const average = Math.round(total / data.length);
+  const maxValue = Math.max(...data.map((item) => item.value));
+  const progress = Math.min(total / (maxValue * data.length || 1), 1);
+  const progressDegrees = progress * 360;
+  const palette = ['#2d8cff', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316', '#6366f1'];
+  const chartEntries = data.map((item, idx) => ({
+    ...item,
+    color: palette[idx % palette.length],
+    share: total ? Math.round((item.value / total) * 100) : 0,
+  }));
+  const rotation = `${Math.max(progressDegrees - 180, 0)}deg`;
+
+  return (
+    <View style={styles.chartCard}>
+      <View style={styles.circleChartLayout}>
+        <View style={styles.circleChartWrap}>
+          <View style={[styles.progressTrack, { borderColor: `${color}20` }]} />
+          <View style={styles.progressMask}>
+            <View style={styles.progressHalfWrapLeft}>
+              <View
+                style={[
+                  styles.progressHalf,
+                  {
+                    borderColor: progress > 0.5 ? color : 'transparent',
+                    left: 0,
+                  },
+                ]}
+              />
+            </View>
+            <View style={styles.progressHalfWrapRight}>
+              <View
+                style={[
+                  styles.progressHalf,
+                  {
+                    borderColor: color,
+                    left: -95,
+                    transform: [{ rotate: rotation }],
+                  },
+                ]}
+              />
+            </View>
+          </View>
+          <View style={styles.progressInner}>
+            <Text style={styles.progressValue}>
+              {valuePrefix}
+              {centerLabel ?? average}
+              {valueSuffix}
+            </Text>
+            <Text style={styles.progressCaption}>{totalLabel}</Text>
+          </View>
+        </View>
+
+        <View style={styles.legendList}>
+          {chartEntries.map((item) => (
+            <View key={item.label} style={styles.legendRow}>
+              <View style={styles.legendLabelRow}>
+                <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                <Text style={styles.legendLabel}>{item.label}</Text>
+              </View>
+              <Text style={styles.legendValue}>
+                {valuePrefix}
+                {item.value}
+                {valueSuffix}
+                <Text style={styles.legendShare}>  {item.share}%</Text>
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
 
 export default function Analytics() {
   const router = useRouter();
@@ -85,14 +178,22 @@ export default function Analytics() {
           </View>
 
           <Text style={styles.sectionTitle}>Monthly Sales Trend</Text>
-          <View style={styles.chartPlaceholder}>
-            <Text style={styles.chartPlaceholderText}>[Line chart placeholder]</Text>
-          </View>
+          <CircularChartCard
+            data={monthlySalesData}
+            color="#2d8cff"
+            valuePrefix="$"
+            centerLabel={`${Math.round(monthlySalesData.reduce((sum, item) => sum + item.value, 0) / 1000)}K`}
+            totalLabel="Total Sales"
+          />
 
           <Text style={styles.sectionTitle}>Order Rate</Text>
-          <View style={styles.chartPlaceholder}>
-            <Text style={styles.chartPlaceholderText}>[Area chart placeholder]</Text>
-          </View>
+          <CircularChartCard
+            data={orderRateData}
+            color="#10b981"
+            valueSuffix="%"
+            centerLabel={Math.round(orderRateData.reduce((sum, item) => sum + item.value, 0) / orderRateData.length)}
+            totalLabel="Avg Order Rate"
+          />
         </ScrollView>
       </View>
     </View>
@@ -350,7 +451,7 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     fontWeight: '600',
   },
-  chartPlaceholder: {
+  chartCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
@@ -360,12 +461,111 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
+  },
+  circleChartLayout: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 20,
+  },
+  circleChartWrap: {
+    width: 190,
+    height: 190,
+    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 180,
   },
-  chartPlaceholderText: {
-    color: '#9ca3af',
-    fontSize: 14,
+  progressTrack: {
+    position: 'absolute',
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    borderWidth: 18,
+  },
+  progressMask: {
+    position: 'absolute',
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    transform: [{ rotate: '-90deg' }],
+  },
+  progressHalfWrapLeft: {
+    position: 'absolute',
+    left: 0,
+    width: 95,
+    height: 190,
+    overflow: 'hidden',
+  },
+  progressHalfWrapRight: {
+    position: 'absolute',
+    right: 0,
+    width: 95,
+    height: 190,
+    overflow: 'hidden',
+  },
+  progressHalf: {
+    position: 'absolute',
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    borderWidth: 18,
+  },
+  progressInner: {
+    position: 'absolute',
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressValue: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1f2b3d',
+  },
+  progressCaption: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  legendList: {
+    flex: 1,
+    minWidth: 220,
+    gap: 10,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eef2f7',
+  },
+  legendLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  legendLabel: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  legendValue: {
+    fontSize: 13,
+    color: '#1f2b3d',
+    fontWeight: '700',
+  },
+  legendShare: {
+    fontSize: 12,
+    color: '#94a3b8',
+    fontWeight: '600',
   },
 });
