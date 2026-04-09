@@ -1,43 +1,33 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const navItems = [
-  { label: 'Dashboard', route: '/dashboard' },
-  { label: 'Reservations', route: '/reservations' },
-  { label: 'Orders', route: '/orders' },
-  { label: 'Menu Management', route: '/menumanagement' },
-  { label: 'Feedback', route: '/feedback' },
-  { label: 'Table Management', route: '/tablemanagement' },
-  { label: 'Waitlist', route: '/waitlist' },
-  { label: 'Customer Profiles', route: '/customerprofiles' },
-  { label: 'Live Chat', route: '/livechat' },
-  { label: 'Analytics', route: '/analytics' },
-  { label: 'Settings', route: '/settings' },
+  { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
+  { label: 'Reservations', route: '/reservations', icon: 'event-seat' },
+  { label: 'Orders', route: '/orders', icon: 'receipt-long' },
+  { label: 'Menu Management', route: '/menumanagement', icon: 'restaurant-menu' },
+  { label: 'Feedback', route: '/feedback', icon: 'message' },
+  { label: 'Table Management', route: '/tablemanagement', icon: 'table-restaurant' },
+  { label: 'Waitlist', route: '/waitlist', icon: 'schedule' },
+  { label: 'Live Chat', route: '/livechat', icon: 'chat' },
+  { label: 'Analytics', route: '/analytics', icon: 'bar-chart' },
+  { label: 'Settings', route: '/settings', icon: 'settings' },
 ];
 
 const stats = [
-  { label: 'Active Reservations', value: 27, change: '+4%', icon: 'restaurant' },
-  { label: 'Orders Today', value: 124, change: '+16%', icon: 'receipt' },
+   { label: 'Active Reservations', value: 27, change: '+4%', icon: 'event-seat' },
+  { label: 'Orders Today', value: 124, change: '+16%', icon: 'receipt-long' },
   { label: 'Pending Feedback', value: 9, change: '-2%', icon: 'message' },
-  { label: 'Waitlist', value: 14, change: '+7%', icon: 'clock' },
+  { label: 'Waitlist', value: 14, change: '+7%', icon: 'schedule' },
 ];
 
-const features = [
-  { title: 'Reservations', description: 'Manage table bookings and arrivals.', icon: 'calendar', route: '/reservations' },
-  { title: 'Orders', description: 'Track orders and kitchen progress.', icon: 'shopping-cart', route: '/orders' },
-  { title: 'Menu Management', description: 'Update dishes, prices and availability.', icon: 'menu', route: '/menumanagement' },
-  { title: 'Customer Feedback', description: 'Review feedback and ratings.', icon: 'thumbs-up', route: '/feedback' },
-  { title: 'Table Management', description: 'Optimize seating layout in real time.', icon: 'grid', route: '/tablemanagement' },
-  { title: 'Waitlist', description: 'Monitor waiting guests efficiently.', icon: 'list', route: '/waitlist' },
-  { title: 'Live Chat', description: 'Support chat with in-house staff.', icon: 'chatbubbles', route: '/livechat' },
-  { title: 'Analytics', description: 'Real-time performance reporting.', icon: 'bar-chart', route: '/analytics' },
-  { title: 'Settings', description: 'Configure your restaurant management system.', icon: 'cog', route: '/settings' },
-];
+
 
 export default function Dashboard() {
   const router = useRouter();
+  const pathname = usePathname();
   const [activityView, setActivityView] = useState('weekly');
 
   const handleNavigation = (route) => {
@@ -51,14 +41,14 @@ export default function Dashboard() {
     router.replace('/');
   };
 
-  // Activity data for different views
+  
   const activityData = {
     weekly: [45, 52, 48, 65, 72, 58, 64],
     monthly: [180, 220, 190, 250, 280, 240, 260, 275, 290, 310, 320, 280],
     yearly: [2400, 2210, 2290, 2000, 2181, 2500, 2100],
   };
 
-  // Order rate line chart data (months)
+  
   const orderRateData = [35, 42, 38, 55, 48, 65, 52, 68, 58, 72, 80, 75];
 
   const SimpleLineChart = ({ data, labels }) => {
@@ -146,22 +136,57 @@ export default function Dashboard() {
   return (
     <View style={styles.appWrapper}>
       <View style={styles.sidebar}>
-        <Text style={styles.brand}>Terraza Noble CMS</Text>
+        <Text style={styles.brand}>Terraza Noble</Text>
         <View style={styles.divider} />
         <ScrollView showsVerticalScrollIndicator={false} style={styles.navContainer}>
-          {navItems.map(({ label, route }) => (
-            <TouchableOpacity
+          {navItems.map(({ label, route, icon }) => (
+            <Pressable
               key={label}
-              style={[styles.navItem, route === '/dashboard' && styles.activeNavItem]}
-              onPress={() => handleNavigation(route)}>
-              <Text style={[styles.navText, route === '/dashboard' && styles.activeNavText]}>{label}</Text>
-            </TouchableOpacity>
+              onPress={() => handleNavigation(route)}
+              style={({ hovered, pressed }) => [
+                styles.navItem,
+                pathname === route && styles.activeNavItem,
+                hovered && styles.hoverNavItem,
+                pressed && styles.pressedNavItem,
+              ]}>
+              {({ hovered, pressed }) => (
+                <View style={styles.navContent}>
+                  <View
+                    style={[
+                      styles.navIconCircle,
+                      pathname === route && styles.activeNavIconCircle,
+                      hovered && styles.hoverNavIconCircle,
+                    ]}>
+                    <MaterialIcons
+                      name={icon}
+                      size={18}
+                      color={hovered || pathname === route ? 'black' : 'white'}
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      styles.navText,
+                      pathname === route && styles.activeNavText,
+                      hovered && styles.hoverNavText,
+                      pressed && styles.pressedNavText,
+                    ]}>
+                    {label}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
           ))}
         </ScrollView>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Pressable
+          onPress={handleLogout}
+          style={({ hovered, pressed }) => [
+            styles.logoutButton,
+            hovered && styles.logoutButtonHover,
+            pressed && styles.logoutButtonPressed,
+          ]}>
           <Ionicons name="log-out" size={16} color="#ffffff" />
           <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <View style={styles.mainSection}>
@@ -171,16 +196,14 @@ export default function Dashboard() {
               <Text style={styles.mainTitle}>Customer Service Dashboard</Text>
               <Text style={styles.mainSubtitle}>Track your restaurant operations at a glance.</Text>
             </View>
-            <TouchableOpacity style={styles.headerBtn}>
-              <Text style={styles.headerBtnText}>New Reservations</Text>
-            </TouchableOpacity>
           </View>
+
 
           <View style={styles.statsRow}>
             {stats.map(({ label, value, change, icon }) => (
               <View key={label} style={styles.statCard}>
                 <View style={styles.statTop}>
-                  <MaterialIcons name={icon} size={24} color="#2d8cff" />
+                  <MaterialIcons name={icon} size={24} color="#3E332F" />
                   <Text style={[styles.changeText, change.startsWith('+') ? styles.positive : styles.negative]}>{change}</Text>
                 </View>
                 <Text style={styles.statValue}>{value}</Text>
@@ -273,11 +296,11 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: width > 900 ? 250 : '100%',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#99897D',
     paddingVertical: 20,
     paddingHorizontal: 12,
     borderRightWidth: width > 900 ? 1 : 0,
-    borderRightColor: '#e5e9f0',
+    borderRightColor: '#e5e7eb',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -289,12 +312,12 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2d8cff',
+    color: 'white',
     marginBottom: 16,
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#e5e7eb',
     marginBottom: 16,
   },
   navContainer: {
@@ -306,18 +329,50 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#99897D',
+  },
+  activeNavItem: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   navText: {
     fontSize: 14,
-    color: '#444',
-  },
-  activeNavItem: {
-    backgroundColor: '#e8f1ff',
+    color: 'white',
+    fontFamily: 'Arial',
   },
   activeNavText: {
-    color: '#2d8cff',
-    fontWeight: 'bold',
+    color: 'black',
+    fontWeight: '600',
+  },
+  navContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  navIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  activeNavIconCircle: {
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+  },
+  hoverNavIconCircle: {
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+  },
+  hoverNavItem: {
+    backgroundColor: '#99897D',
+  },
+  hoverNavText: {
+    color: 'black',
+  },
+  pressedNavItem: {
+    opacity: 0.85,
+  },
+  pressedNavText: {
+    color: 'black',
   },
   mainSection: {
     flex: 1,
@@ -690,6 +745,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     zIndex: 20,
+  },
+  logoutButtonHover: {
+    backgroundColor: '#c53030',
+  },
+  logoutButtonPressed: {
+    opacity: 0.9,
   },
   logoutText: {
     color: '#fff',

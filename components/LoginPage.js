@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <ImageBackground
-      source={{ uri: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80' }}
+      source={{ uri: 'https://plus.unsplash.com/premium_photo-1661962305366-0c62646fd249?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdGF1cmFudCUyMGJhY2tncm91bmR8ZW58MHx8MHx8fDA%3D' }}
       style={styles.background}
     >
       <View style={styles.container}>
