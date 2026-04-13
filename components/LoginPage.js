@@ -2,20 +2,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { USER_DEMO_EMAIL, USER_DEMO_PASSWORD } from '../config/access';
+import { useAccess } from '../context/AccessContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { unlockUserArea } = useAccess();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = () => {
-    if (email && password) {
-      Alert.alert('Login Attempt', `Email: ${email}\nPassword: ${password}`);
-      router.push('/dashboard');
-    } else {
+    if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password');
+      return;
     }
+
+    if (email.trim().toLowerCase() !== USER_DEMO_EMAIL || password !== USER_DEMO_PASSWORD) {
+      Alert.alert('Invalid login', 'Use the guest email and password for the user side.');
+      return;
+    }
+
+    unlockUserArea();
+    router.push('/user');
   };
 
   return (
@@ -26,7 +35,7 @@ export default function LoginPage() {
       <View style={styles.container}>
         <View style={styles.loginBox}>
           <Text style={styles.title}>Welcome to Terraza Noble</Text>
-          <Text style={styles.subtitle}>Sign in to access your customer service dashboard</Text>
+          <Text style={styles.subtitle}>User sign in with email and password. Admin access is protected separately by passkey.</Text>
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
@@ -50,8 +59,12 @@ export default function LoginPage() {
             <Text style={styles.checkboxLabel}>Remember me</Text>
           </View>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>User Login</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.userButton} onPress={() => router.push('/admin-access')}>
+            <Text style={styles.userButtonText}>Admin Passkey Access</Text>
+          </TouchableOpacity>
+          <Text style={styles.demoHint}>Guest demo: {USER_DEMO_EMAIL} / {USER_DEMO_PASSWORD}</Text>
           <TouchableOpacity onPress={() => Alert.alert('Forgot Password', 'Reset instructions sent to your email.')}>
             <Text style={styles.forgotText}>Forgot Password?</Text>
           </TouchableOpacity>
@@ -135,6 +148,27 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  userButton: {
+    marginTop: 10,
+    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 6,
+    backgroundColor: '#1f2937',
+  },
+  userButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  demoHint: {
+    width: '90%',
+    marginTop: 12,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#6b7280',
   },
   helpButton: {
     position: 'absolute',

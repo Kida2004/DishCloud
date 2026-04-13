@@ -2,6 +2,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAccess } from '../context/AccessContext';
 
 const navItems = [
   { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
@@ -28,6 +29,7 @@ const stats = [
 export default function Dashboard() {
   const router = useRouter();
   const pathname = usePathname();
+  const { lockAdminArea } = useAccess();
   const [activityView, setActivityView] = useState('weekly');
 
   const handleNavigation = (route) => {
@@ -37,8 +39,9 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
+    lockAdminArea();
     Alert.alert('Logged out', 'You have been logged out.');
-    router.replace('/');
+    router.replace('/admin-access');
   };
 
   

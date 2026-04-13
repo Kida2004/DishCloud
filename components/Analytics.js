@@ -1,6 +1,7 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useAccess } from '../context/AccessContext';
 
 const navItems = [
   { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
@@ -112,6 +113,7 @@ function CircularChartCard({ data, color, valuePrefix = '', valueSuffix = '', ce
 export default function Analytics() {
   const router = useRouter();
   const pathname = usePathname();
+  const { lockAdminArea } = useAccess();
 
   const handleNavigation = (route) => {
     if (route) {
@@ -120,8 +122,13 @@ export default function Analytics() {
   };
 
   const handleLogout = () => {
+    lockAdminArea();
     Alert.alert('Logged out', 'You have been logged out.');
-    router.replace('/');
+    router.replace('/admin-access');
+  };
+
+  const handleReportPress = () => {
+    Alert.alert('Report ready', 'Your analytics report is being prepared.');
   };
 
   return (
@@ -170,6 +177,12 @@ export default function Analytics() {
               <Text style={styles.mainTitle}>Analytics & Reports</Text>
               <Text style={styles.mainSubtitle}>View performance metrics and business insights.</Text>
             </View>
+            <Pressable
+              onPress={handleReportPress}
+              style={({ pressed }) => [styles.reportButton, pressed && styles.reportButtonPressed]}>
+              <MaterialIcons name="description" size={18} color="#ffffff" />
+              <Text style={styles.reportButtonText}>Generate Report</Text>
+            </Pressable>
           </View>
 
           <View style={styles.statsRow}>
@@ -443,6 +456,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
     marginBottom: 20,
   },
   mainTitle: {
@@ -454,6 +471,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     marginTop: 6,
+  },
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2d8cff',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+  },
+  reportButtonPressed: {
+    opacity: 0.88,
+  },
+  reportButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
   statsRow: {
     flexDirection: width > 800 ? 'row' : 'column',

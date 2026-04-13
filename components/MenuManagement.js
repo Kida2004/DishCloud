@@ -1,6 +1,8 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Alert, Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAccess } from '../context/AccessContext';
 
 const navItems = [
   { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
@@ -17,43 +19,56 @@ const navItems = [
 
 const menuItems = [
   {
+    id: 'grilled-salmon',
     name: 'Grilled Salmon',
     price: '$24.99',
     category: 'Main Course',
     status: 'Available',
+    prepTime: 18,
+    hidden: false,
     description: 'Lemon herb salmon with roasted vegetables and garlic butter.',
     image: 'https://plus.unsplash.com/premium_photo-1723478417559-2349252a3dda?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JpbGxlZCUyMHNhbG1vbnxlbnwwfHwwfHx8MA%3D%3D',
   },
   {
+    id: 'caesar-salad',
     name: 'Caesar Salad',
     price: '$12.50',
     category: 'Appetizer',
     status: 'Available',
+    prepTime: 10,
+    hidden: false,
     description: 'Crisp romaine, parmesan, croutons, and house Caesar dressing.',
     image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2Flc2FyJTIwc2FsYWR8ZW58MHx8MHx8fDA%3D',
   },
   {
+    id: 'chocolate-cake',
     name: 'Chocolate Cake',
     price: '$8.99',
     category: 'Dessert',
     status: 'Unavailable',
+    prepTime: 14,
+    hidden: false,
     description: 'Rich layered cake with dark chocolate ganache and berries.',
     image: 'https://images.unsplash.com/photo-1702841579337-410618db2715?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTV8fGNob2NvbGF0ZSUyMGNha2V8ZW58MHx8MHx8fDA%3D',
   },
   {
+    id: 'espresso',
     name: 'Espresso',
     price: '$4.50',
     category: 'Beverage',
     status: 'Available',
+    prepTime: 5,
+    hidden: false,
     description: 'Bold single-shot espresso with a deep aroma and smooth crema.',
     image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZXNwcmVzc298ZW58MHx8MHx8fDA%3D',
   },
 ];
 
-
 export default function MenuManagement() {
   const router = useRouter();
   const pathname = usePathname();
+  const { lockAdminArea } = useAccess();
+  const [items, setItems] = useState(menuItems);
 
   const handleNavigation = (route) => {
     if (route) {
@@ -62,8 +77,31 @@ export default function MenuManagement() {
   };
 
   const handleLogout = () => {
+    lockAdminArea();
     Alert.alert('Logged out', 'You have been logged out.');
-    router.replace('/');
+    router.replace('/admin-access');
+  };
+
+  const commitItemsUpdate = (updater) => {
+    setItems((currentItems) => {
+      const nextItems = typeof updater === 'function' ? updater(currentItems) : updater;
+
+      if (JSON.stringify(nextItems) === JSON.stringify(currentItems)) {
+        return currentItems;
+      }
+
+      return nextItems;
+    });
+  };
+
+  const toggleHidden = (itemId) => {
+    commitItemsUpdate((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId
+          ? { ...item, hidden: !item.hidden }
+          : item
+      )
+    );
   };
 
   return (
@@ -112,10 +150,12 @@ export default function MenuManagement() {
               <Text style={styles.mainTitle}>Menu Management</Text>
               <Text style={styles.mainSubtitle}>Update menu items, pricing, and availability.</Text>
             </View>
-            <TouchableOpacity style={styles.addBtn}>
-              <MaterialIcons name="add" size={20} color="#fff" />
-              <Text style={styles.addBtnText}>Add Menu Item</Text>
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.addBtn}>
+                <MaterialIcons name="add" size={20} color="#fff" />
+                <Text style={styles.addBtnText}>Add Menu Item</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.categoryScroll}>
@@ -137,25 +177,36 @@ export default function MenuManagement() {
           </View>
 
           <View style={styles.menuItemsGrid}>
-            {menuItems.map((item, idx) => (
-              <View key={idx} style={styles.menuItem}>
+            {items.map((item) => (
+              <View key={item.id} style={[styles.menuItem, item.hidden && styles.menuItemHidden]}>
                 <Image source={{ uri: item.image }} style={styles.menuImage} />
                 <View style={styles.itemHeader}>
                   <View style={styles.itemTextContent}>
                     <Text style={styles.itemName}>{item.name}</Text>
                     <Text style={styles.itemCategory}>{item.category}</Text>
-                    <Text style={styles.itemDescription}>{item.description}</Text>
-                    <Text style={styles.itemDetails}>{item.details}</Text>
-                  </View>
-                  <View style={styles.statusContainer}>
-                    <Text style={[styles.itemStatus, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
-                      ●
+                    <Text style={styles.itemDescription}>
+                      {item.description}{'\n'}
+                      <Text style={styles.prepTimeHighlight}>Prep time: {item.prepTime} mins</Text>
                     </Text>
-                    <Text style={[styles.statusText, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
+
+                    <View style={styles.metaRow}>
+                      {item.hidden && (
+                        <View style={styles.hiddenBadge}>
+                          <MaterialIcons name="visibility-off" size={14} color="#7c2d12" />
+                          <Text style={styles.hiddenBadgeText}>Hidden</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+
+                  <View style={styles.statusContainer}>
+                    <MaterialIcons name="fiber-manual-record" size={14} color={item.status === 'Available' ? '#10b981' : '#ef4444'} />
+                    <Text style={[styles.statusText, item.status === 'Available' ? { color: '#10b981' } : { color: '#ef4444' }]}>
                       {item.status}
                     </Text>
                   </View>
                 </View>
+
                 <View style={styles.itemFooter}>
                   <Text style={styles.itemPrice}>{item.price}</Text>
                   <View style={styles.itemActions}>
@@ -171,14 +222,15 @@ export default function MenuManagement() {
                       </View>
                     </Pressable>
                     <Pressable
+                      onPress={() => toggleHidden(item.id)}
                       style={({ hovered, pressed }) => [
                         styles.deleteBtn,
                         hovered && styles.deleteBtnHover,
                         pressed && styles.actionBtnPressed,
                       ]}>
                       <View style={styles.actionBtnContent}>
-                        <Text style={styles.deleteBtnText}>Delete</Text>
-                        <MaterialIcons name="delete" size={16} color="#ffffff" />
+                        <Text style={styles.deleteBtnText}>{item.hidden ? 'Show' : 'Hide'}</Text>
+                        <MaterialIcons name={item.hidden ? 'visibility' : 'visibility-off'} size={16} color="#ffffff" />
                       </View>
                     </Pressable>
                   </View>
@@ -479,7 +531,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
     marginBottom: 20,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 10,
   },
   mainTitle: {
     fontSize: 26,
@@ -544,6 +604,9 @@ const styles = StyleSheet.create({
     elevation: 2,
     overflow: 'hidden',
   },
+  menuItemHidden: {
+    opacity: 0.78,
+  },
   menuImage: {
     width: '100%',
     height: 170,
@@ -576,15 +639,32 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#374151',
     lineHeight: 19,
-    marginBottom: 6,
   },
-  itemDetails: {
-    fontSize: 12,
-    color: '#9ca3af',
-    fontWeight: '600',
+  prepTimeHighlight: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1f2b3d',
   },
-  itemStatus: {
-    fontSize: 20,
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 10,
+  },
+  hiddenBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#ffedd5',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  hiddenBadgeText: {
+    fontSize: 11,
+    color: '#7c2d12',
+    fontWeight: '700',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -637,7 +717,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   deleteBtn: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#94a3b8',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
@@ -645,7 +725,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   deleteBtnHover: {
-    backgroundColor: '#dc2626',
+    backgroundColor: '#b4bcc8',
   },
   actionBtnContent: {
     flexDirection: 'row',
@@ -657,4 +737,3 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
 });
-
