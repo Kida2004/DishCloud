@@ -2,7 +2,6 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useAccess } from '../context/AccessContext';
 
 const navItems = [
   { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
@@ -19,56 +18,52 @@ const navItems = [
 
 const menuItems = [
   {
-    id: 'grilled-salmon',
+    id: 1,
     name: 'Grilled Salmon',
     price: '$24.99',
     category: 'Main Course',
     status: 'Available',
-    prepTime: 18,
-    hidden: false,
+    prepTime: '18 mins',
     description: 'Lemon herb salmon with roasted vegetables and garlic butter.',
     image: 'https://plus.unsplash.com/premium_photo-1723478417559-2349252a3dda?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JpbGxlZCUyMHNhbG1vbnxlbnwwfHwwfHx8MA%3D%3D',
   },
   {
-    id: 'caesar-salad',
+    id: 2,
     name: 'Caesar Salad',
     price: '$12.50',
     category: 'Appetizer',
     status: 'Available',
-    prepTime: 10,
-    hidden: false,
+    prepTime: '10 mins',
     description: 'Crisp romaine, parmesan, croutons, and house Caesar dressing.',
     image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2Flc2FyJTIwc2FsYWR8ZW58MHx8MHx8fDA%3D',
   },
   {
-    id: 'chocolate-cake',
+    id: 3,
     name: 'Chocolate Cake',
     price: '$8.99',
     category: 'Dessert',
     status: 'Unavailable',
-    prepTime: 14,
-    hidden: false,
+    prepTime: '12 mins',
     description: 'Rich layered cake with dark chocolate ganache and berries.',
     image: 'https://images.unsplash.com/photo-1702841579337-410618db2715?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTV8fGNob2NvbGF0ZSUyMGNha2V8ZW58MHx8MHx8fDA%3D',
   },
   {
-    id: 'espresso',
+    id: 4,
     name: 'Espresso',
     price: '$4.50',
     category: 'Beverage',
     status: 'Available',
-    prepTime: 5,
-    hidden: false,
+    prepTime: '5 mins',
     description: 'Bold single-shot espresso with a deep aroma and smooth crema.',
     image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZXNwcmVzc298ZW58MHx8MHx8fDA%3D',
   },
 ];
 
+
 export default function MenuManagement() {
   const router = useRouter();
   const pathname = usePathname();
-  const { lockAdminArea } = useAccess();
-  const [items, setItems] = useState(menuItems);
+  const [menuItemsData, setMenuItemsData] = useState(menuItems);
 
   const handleNavigation = (route) => {
     if (route) {
@@ -77,29 +72,14 @@ export default function MenuManagement() {
   };
 
   const handleLogout = () => {
-    lockAdminArea();
     Alert.alert('Logged out', 'You have been logged out.');
-    router.replace('/admin-access');
+    router.replace('/');
   };
 
-  const commitItemsUpdate = (updater) => {
-    setItems((currentItems) => {
-      const nextItems = typeof updater === 'function' ? updater(currentItems) : updater;
-
-      if (JSON.stringify(nextItems) === JSON.stringify(currentItems)) {
-        return currentItems;
-      }
-
-      return nextItems;
-    });
-  };
-
-  const toggleHidden = (itemId) => {
-    commitItemsUpdate((currentItems) =>
+  const handleHideItem = (itemId) => {
+    setMenuItemsData((currentItems) =>
       currentItems.map((item) =>
-        item.id === itemId
-          ? { ...item, hidden: !item.hidden }
-          : item
+        item.id === itemId ? { ...item, hidden: !item.hidden } : item
       )
     );
   };
@@ -150,12 +130,10 @@ export default function MenuManagement() {
               <Text style={styles.mainTitle}>Menu Management</Text>
               <Text style={styles.mainSubtitle}>Update menu items, pricing, and availability.</Text>
             </View>
-            <View style={styles.headerActions}>
-              <TouchableOpacity style={styles.addBtn}>
-                <MaterialIcons name="add" size={20} color="#fff" />
-                <Text style={styles.addBtnText}>Add Menu Item</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.addBtn}>
+              <MaterialIcons name="add" size={20} color="#fff" />
+              <Text style={styles.addBtnText}>Add Menu Item</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.categoryScroll}>
@@ -177,36 +155,31 @@ export default function MenuManagement() {
           </View>
 
           <View style={styles.menuItemsGrid}>
-            {items.map((item) => (
-              <View key={item.id} style={[styles.menuItem, item.hidden && styles.menuItemHidden]}>
+            {menuItemsData.map((item) => (
+              <View key={item.id} style={[styles.menuItem, item.hidden && styles.hiddenMenuItem]}>
                 <Image source={{ uri: item.image }} style={styles.menuImage} />
                 <View style={styles.itemHeader}>
                   <View style={styles.itemTextContent}>
                     <Text style={styles.itemName}>{item.name}</Text>
+                    {item.hidden ? (
+                      <View style={styles.hiddenBadge}>
+                        <Text style={styles.hiddenBadgeText}>Hidden</Text>
+                      </View>
+                    ) : null}
                     <Text style={styles.itemCategory}>{item.category}</Text>
-                    <Text style={styles.itemDescription}>
-                      {item.description}{'\n'}
-                      <Text style={styles.prepTimeHighlight}>Prep time: {item.prepTime} mins</Text>
-                    </Text>
-
-                    <View style={styles.metaRow}>
-                      {item.hidden && (
-                        <View style={styles.hiddenBadge}>
-                          <MaterialIcons name="visibility-off" size={14} color="#7c2d12" />
-                          <Text style={styles.hiddenBadgeText}>Hidden</Text>
-                        </View>
-                      )}
-                    </View>
+                    <Text style={styles.itemDescription}>{item.description}</Text>
+                    <Text style={styles.itemDetails}>Prep time: {item.prepTime}</Text>
+                    {item.details ? <Text style={styles.itemDetails}>{item.details}</Text> : null}
                   </View>
-
                   <View style={styles.statusContainer}>
-                    <MaterialIcons name="fiber-manual-record" size={14} color={item.status === 'Available' ? '#10b981' : '#ef4444'} />
-                    <Text style={[styles.statusText, item.status === 'Available' ? { color: '#10b981' } : { color: '#ef4444' }]}>
+                    <Text style={[styles.itemStatus, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
+                      ●
+                    </Text>
+                    <Text style={[styles.statusText, item.status === 'Available' ? {color: '#10b981'} : {color: '#ef4444'}]}>
                       {item.status}
                     </Text>
                   </View>
                 </View>
-
                 <View style={styles.itemFooter}>
                   <Text style={styles.itemPrice}>{item.price}</Text>
                   <View style={styles.itemActions}>
@@ -222,14 +195,14 @@ export default function MenuManagement() {
                       </View>
                     </Pressable>
                     <Pressable
-                      onPress={() => toggleHidden(item.id)}
+                      onPress={() => handleHideItem(item.id)}
                       style={({ hovered, pressed }) => [
-                        styles.deleteBtn,
-                        hovered && styles.deleteBtnHover,
+                        styles.hideBtn,
+                        hovered && styles.hideBtnHover,
                         pressed && styles.actionBtnPressed,
                       ]}>
                       <View style={styles.actionBtnContent}>
-                        <Text style={styles.deleteBtnText}>{item.hidden ? 'Show' : 'Hide'}</Text>
+                        <Text style={styles.hideBtnText}>{item.hidden ? 'Show' : 'Hide'}</Text>
                         <MaterialIcons name={item.hidden ? 'visibility' : 'visibility-off'} size={16} color="#ffffff" />
                       </View>
                     </Pressable>
@@ -531,15 +504,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
     marginBottom: 20,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 10,
   },
   mainTitle: {
     fontSize: 26,
@@ -604,9 +569,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     overflow: 'hidden',
   },
-  menuItemHidden: {
-    opacity: 0.78,
-  },
   menuImage: {
     width: '100%',
     height: 170,
@@ -639,32 +601,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#374151',
     lineHeight: 19,
+    marginBottom: 6,
   },
-  prepTimeHighlight: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#1f2b3d',
+  itemDetails: {
+    fontSize: 12,
+    color: '#9ca3af',
+    fontWeight: '600',
   },
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 10,
-  },
-  hiddenBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#ffedd5',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-  },
-  hiddenBadgeText: {
-    fontSize: 11,
-    color: '#7c2d12',
-    fontWeight: '700',
+  itemStatus: {
+    fontSize: 20,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -711,21 +656,41 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  deleteBtnText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  deleteBtn: {
-    backgroundColor: '#94a3b8',
+  hideBtn: {
+    backgroundColor: '#6b7280',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
     minWidth: 92,
     justifyContent: 'center',
   },
-  deleteBtnHover: {
-    backgroundColor: '#b4bcc8',
+  hideBtnHover: {
+    backgroundColor: '#4b5563',
+  },
+  hideBtnText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  hiddenMenuItem: {
+    opacity: 0.45,
+    borderColor: '#d1d5db',
+    borderWidth: 1,
+  },
+  hiddenBadge: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: '#f97316',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 8,
+  },
+  hiddenBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
   actionBtnContent: {
     flexDirection: 'row',

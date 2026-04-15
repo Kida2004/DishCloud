@@ -1,5 +1,5 @@
-import UserPortalShell from '../../components/UserPortalShell';
+import UserMenuPage from '../../components/UserMenuPage';
 
 export default function UserMenuRoute() {
-  return <UserPortalShell screen="menu" />;
+  return <UserMenuPage />;
 }

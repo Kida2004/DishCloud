@@ -1,5 +1,5 @@
-import UserPortalShell from '../../components/UserPortalShell';
+import { Redirect } from 'expo-router';
 
 export default function UserProfileRoute() {
-  return <UserPortalShell screen="profile" />;
+  return <Redirect href="/user/feedback" />;
 }

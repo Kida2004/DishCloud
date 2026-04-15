@@ -1,5 +1,6 @@
-import UserPortalShell from '../../components/UserPortalShell';
+import UserReservationsPage from '../../components/UserReservationsPage';
 
 export default function UserReservationsRoute() {
-  return <UserPortalShell screen="reservations" />;
+  return <UserReservationsPage />;
 }
+
