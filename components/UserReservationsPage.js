@@ -445,17 +445,18 @@ export default function UserReservationsPage() {
               </Text>
             </View>
 
-            <View style={styles.verticalCategoryContainer}>
-              {categories.map((cat) => {
-                const isActive = cat === selectedCategory;
+            <View style={styles.categoryRow}>
+              {categories.map((category) => {
+                const isActive = category === selectedCategory;
+
                 return (
                   <TouchableOpacity
-                    key={cat}
-                    onPress={() => setSelectedCategory(cat)}
-                    style={[styles.verticalCategoryTag, isActive && styles.verticalCategoryTagActive]}
+                    key={category}
+                    onPress={() => setSelectedCategory(category)}
+                    style={[styles.categoryTag, isActive && styles.categoryTagActive]}
                   >
-                    <Text style={[styles.verticalCategoryText, isActive && styles.verticalCategoryTextActive]}>
-                      {cat}
+                    <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
+                      {category}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -880,29 +881,29 @@ menuHeader: {
     marginTop: 4,
   },
 
-  verticalCategoryContainer: {
+  categoryRow: {
+    marginTop: 8,
     marginBottom: 24,
-    gap: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  verticalCategoryTag: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5DED3',
+  categoryTag: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: '#eadbc8',
   },
-  verticalCategoryTagActive: {
-    backgroundColor: '#4A3728',
-    borderColor: '#4A3728',
+  categoryTagActive: {
+    backgroundColor: '#6b4f3c',
   },
-  verticalCategoryText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#555555',
+  categoryText: {
+    color: '#6b4f3c',
+    fontSize: 13,
+    fontWeight: '700',
   },
-  verticalCategoryTextActive: {
-    color: '#FFFFFF',
+  categoryTextActive: {
+    color: '#fffaf5',
   },
 
   menuGrid: {
@@ -912,11 +913,9 @@ menuHeader: {
   },
   menuCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,           // ← Matches original
+    backgroundColor: '#fff',
+    borderRadius: 22,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5DED3',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -928,17 +927,16 @@ menuHeader: {
   },
   menuImage: {
     width: '100%',
-    height: 190,                // ← Nice rounded image height
+    height: 190,
+    backgroundColor: '#e5e7eb',
   },
   menuBody: {
     padding: 18,
   },
-
   itemTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 14,
-    marginBottom: 12,
   },
   itemTextBlock: {
     flex: 1,
@@ -946,46 +944,44 @@ menuHeader: {
   itemName: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#1F1F1F',
+    color: '#1f2937',
   },
   itemCategory: {
     marginTop: 4,
     fontSize: 12,
-    color: '#9A3412',
+    color: '#9a3412',
     fontWeight: '700',
     textTransform: 'uppercase',
   },
-
   statusPill: {
     alignSelf: 'flex-start',
-    backgroundColor: '#DCFCE7',
+    backgroundColor: '#dcfce7',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
   statusText: {
-    color: '#15803D',
+    color: '#15803d',
     fontSize: 12,
     fontWeight: '700',
   },
-
   itemDescription: {
+    marginTop: 12,
     fontSize: 14,
     lineHeight: 21,
-    color: '#4B5563',
-    marginBottom: 8,
+    color: '#4b5563',
   },
   itemMeta: {
+    marginTop: 8,
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#9ca3af',
     fontWeight: '700',
   },
-
   itemFooter: {
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: '#EEE5D9',
+    borderTopColor: '#eee5d9',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -993,7 +989,7 @@ menuHeader: {
   itemPrice: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#1F1F1F',
+    color: '#1f2937',
   },
 
   quantityControls: {
